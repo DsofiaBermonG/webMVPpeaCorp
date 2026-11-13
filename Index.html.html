@@ -1,0 +1,751 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+<meta charset="utf-8">
+<meta name="viewport" content="width=device-width, initial-scale=1">
+<title>PeaCorp · Prototipo MVP</title>
+<style>
+/* ===== Paleta oficial PeaCorp ===== */
+:root{--pine:#344E41;--hunter:#3A5A40;--fern:#588157;--sage:#A3B18A;--dust:#DAD7CD;--cream:#F4F1E8;--ink:#233229;--muted:#5f6d63;--line:#e3dfd2;--amber:#B9791F;--r:16px;--sh:0 4px 16px rgba(52,78,65,.12)}
+*{box-sizing:border-box}
+html{scroll-behavior:smooth}
+body{margin:0;font-family:system-ui,-apple-system,"Segoe UI",Roboto,Arial,sans-serif;background:var(--cream);color:var(--ink);line-height:1.45}
+h1,h2,h3,h4{font-family:Georgia,"Times New Roman",serif;color:var(--pine);margin:0 0 .4em}
+h1{font-size:2.1rem;line-height:1.15}h2{font-size:1.45rem}h3{font-size:1.08rem}
+p{margin:0 0 .7em}
+button,input,select,textarea{font:inherit;color:inherit}
+.wrap{max-width:1180px;margin:0 auto;padding:0 20px}
+.muted{color:var(--muted)}.small{font-size:.85rem}.right{text-align:right}
+
+/* Encabezado */
+header.top{background:var(--pine);color:#fff;position:sticky;top:0;z-index:30;box-shadow:0 2px 10px rgba(0,0,0,.18)}
+header.top .wrap{display:flex;align-items:center;gap:14px;padding:10px 20px;flex-wrap:wrap}
+.brand{display:flex;align-items:center;gap:10px;font-family:Georgia,serif;font-size:1.45rem;font-weight:700;cursor:pointer;background:none;border:0;color:#fff;padding:0}
+nav.nav{display:flex;gap:4px;margin-left:8px;flex-wrap:wrap}
+.nav button{background:none;border:0;color:var(--dust);padding:8px 14px;border-radius:999px;cursor:pointer}
+.nav button.on,.nav button:hover{background:var(--hunter);color:#fff}
+.nav .n{background:var(--sage);color:var(--pine);border-radius:99px;font-size:.72rem;font-weight:700;padding:1px 7px;margin-left:4px}
+.sw{margin-left:auto;display:flex;align-items:center;gap:10px;font-size:.92rem}
+.switch{width:46px;height:25px;border-radius:99px;background:var(--hunter);border:1px solid var(--sage);position:relative;cursor:pointer;padding:0}
+.switch::after{content:"";position:absolute;top:3px;left:3px;width:17px;height:17px;border-radius:50%;background:#fff;transition:.2s}
+.switch[aria-checked=true]{background:var(--fern)}
+.switch[aria-checked=true]::after{left:24px}
+.modo-tag{background:var(--sage);color:var(--pine);border-radius:99px;padding:3px 12px;font-size:.8rem;font-weight:700}
+
+main{padding:24px 0 40px;min-height:70vh}
+footer{background:var(--pine);color:var(--dust);padding:18px 0;font-size:.82rem}
+footer .wrap{display:flex;justify-content:space-between;gap:12px;flex-wrap:wrap;align-items:center}
+footer button{background:none;border:1px solid var(--sage);color:var(--dust);border-radius:99px;padding:3px 12px;font-size:.78rem;cursor:pointer;opacity:.75}
+footer button:hover{opacity:1}
+
+/* Botones */
+.btn{border:0;border-radius:999px;padding:10px 20px;cursor:pointer;font-weight:600;background:var(--fern);color:#fff;transition:.15s}
+.btn:hover{background:var(--hunter)}
+.btn.alt{background:#fff;color:var(--hunter);border:1.5px solid var(--fern)}
+.btn.alt:hover{background:var(--dust)}
+.btn.sm{padding:6px 14px;font-size:.85rem}
+.btn[disabled]{opacity:.45;cursor:not-allowed}
+.btn.warn{background:var(--amber)}
+.link{background:none;border:0;color:var(--hunter);text-decoration:underline;cursor:pointer;padding:0;font-size:.85rem}
+
+/* Tarjetas */
+.card{background:#fff;border-radius:var(--r);box-shadow:var(--sh);padding:18px}
+.grid{display:grid;gap:18px}
+.g4{grid-template-columns:repeat(auto-fill,minmax(235px,1fr))}
+.g2{grid-template-columns:1fr 1fr}
+.g3{grid-template-columns:repeat(3,1fr)}
+.prod{padding:0;overflow:hidden;cursor:pointer;transition:.15s;display:flex;flex-direction:column}
+.prod:hover{transform:translateY(-3px);box-shadow:0 8px 22px rgba(52,78,65,.2)}
+.img{background:linear-gradient(145deg,#ECE8DC,var(--dust));aspect-ratio:1/.82;display:flex;align-items:center;justify-content:center;position:relative}
+.img svg{width:62%;height:auto;filter:drop-shadow(0 4px 6px rgba(0,0,0,.15))}
+.img .tag{position:absolute;top:10px;left:10px}
+.prod .body{padding:12px 14px 14px;display:flex;flex-direction:column;gap:4px;flex:1}
+.prod h3{margin:0;font-size:1rem}
+.precio{font-size:1.2rem;font-weight:700;color:var(--hunter)}
+.stars{color:#C08A1E;letter-spacing:1px}
+.tags{display:flex;gap:6px;flex-wrap:wrap;margin-top:auto;padding-top:6px}
+.tg{font-size:.72rem;border-radius:99px;padding:2px 9px;background:var(--dust);color:var(--pine);font-weight:600}
+.tag{font-size:.72rem;border-radius:99px;padding:3px 10px;font-weight:700}
+.tag.dest{background:var(--pine);color:#fff}
+.tag.prio{background:var(--sage);color:var(--pine)}
+.bd{display:inline-flex;align-items:center;gap:3px;font-size:.7rem;font-weight:700;padding:2px 8px;border-radius:99px;white-space:nowrap}
+.bd.v{background:var(--fern);color:#fff}
+.bd.i{background:#fff;color:var(--hunter);border:1px solid var(--sage)}
+
+/* Buscador */
+.hero{background:linear-gradient(135deg,var(--pine),var(--hunter));color:#fff;border-radius:22px;padding:30px 30px 24px;margin-bottom:22px}
+.hero h1{color:#fff}.hero p{color:var(--dust)}
+.sform{display:flex;gap:10px;margin:14px 0 10px}
+.sform input{flex:1;border:0;border-radius:999px;padding:14px 22px;font-size:1.05rem;min-width:0}
+.sform .cam{background:var(--dust);color:var(--pine);border:0;border-radius:50%;width:50px;cursor:pointer;font-size:1.2rem}
+.ejs{display:flex;gap:8px;flex-wrap:wrap;font-size:.85rem;align-items:center}
+.ejs button{background:rgba(255,255,255,.12);border:1px solid rgba(255,255,255,.3);color:#fff;border-radius:99px;padding:4px 12px;cursor:pointer}
+.ejs button:hover{background:rgba(255,255,255,.25)}
+.filtros{display:flex;gap:12px;flex-wrap:wrap;align-items:flex-end;margin-bottom:12px}
+.filtros label{display:flex;flex-direction:column;font-size:.78rem;font-weight:600;color:var(--muted);gap:3px}
+.filtros select,.filtros input[type=number]{border:1px solid var(--sage);border-radius:10px;padding:7px 10px;background:#fff;min-width:110px}
+.filtros .chk{flex-direction:row;align-items:center;gap:6px;padding-bottom:8px;font-size:.9rem;color:var(--ink)}
+.entendi{background:#fff;border:1px dashed var(--sage);border-radius:12px;padding:9px 12px;margin-bottom:12px;display:flex;gap:8px;flex-wrap:wrap;align-items:center}
+.chip{background:var(--dust);color:var(--pine);border-radius:99px;padding:3px 6px 3px 12px;font-size:.85rem;font-weight:600;display:inline-flex;gap:6px;align-items:center}
+.chip button{border:0;background:var(--sage);color:var(--pine);border-radius:50%;width:19px;height:19px;cursor:pointer;line-height:1;padding:0;font-weight:700}
+.rhead{display:flex;justify-content:space-between;align-items:baseline;flex-wrap:wrap;gap:6px;margin-bottom:12px}
+.vacio{text-align:center;padding:40px 20px}
+.vacio .big{font-size:3rem}
+
+/* Ficha */
+.ficha{display:grid;grid-template-columns:1fr 1.1fr;gap:26px;align-items:start}
+.ficha .img{border-radius:var(--r);aspect-ratio:1/.9;position:sticky;top:84px}
+.ficha .acc{padding-bottom:4px}
+.ficha .img svg{width:58%}
+.vend{display:flex;justify-content:space-between;align-items:center;gap:10px;background:var(--cream);border-radius:12px;padding:12px 14px;margin:12px 0;flex-wrap:wrap}
+table.tec{width:100%;border-collapse:collapse;margin:8px 0 12px}
+table.tec td{padding:7px 4px;border-bottom:1px solid var(--line)}
+table.tec td:first-child{color:var(--muted);width:40%}
+.tallas{display:flex;gap:8px;flex-wrap:wrap}
+.tallas button{border:1.5px solid var(--sage);background:#fff;border-radius:10px;padding:6px 14px;cursor:pointer;font-weight:600}
+.tallas button.on{background:var(--hunter);color:#fff;border-color:var(--hunter)}
+.pago{background:#EEF2E6;border-left:4px solid var(--fern);padding:10px 14px;border-radius:8px;margin:12px 0;font-size:.92rem}
+.acc{display:flex;gap:10px;flex-wrap:wrap;margin-top:6px}
+.back{margin-bottom:12px}
+
+/* Mapa */
+.mapa{width:100%;height:auto;border-radius:12px;background:#E7E4D8;display:block}
+
+/* Modal y toast */
+.overlay{position:fixed;inset:0;background:rgba(35,50,41,.55);z-index:50;display:flex;align-items:center;justify-content:center;padding:16px}
+.modal{background:#fff;border-radius:20px;max-width:480px;width:100%;max-height:92vh;overflow:auto;padding:24px;box-shadow:0 18px 50px rgba(0,0,0,.35)}
+.modal.wide{max-width:600px}
+.modal label{display:block;margin:10px 0;font-weight:600;font-size:.9rem}
+.modal select,.modal input[type=text],.modal input[type=number],.modal textarea{width:100%;border:1px solid var(--sage);border-radius:10px;padding:8px 10px;margin-top:4px;font-weight:400;background:#fff}
+.modal fieldset{border:1px solid var(--line);border-radius:12px;margin:12px 0;padding:6px 14px}
+.opt{font-weight:400!important;display:flex!important;gap:8px;align-items:center}
+.qty{display:inline-flex;align-items:center;gap:14px;margin-top:4px}
+.qty button{width:32px;height:32px;border-radius:50%;border:1.5px solid var(--fern);background:#fff;cursor:pointer;font-size:1.1rem}
+.mfoot{display:flex;gap:10px;justify-content:flex-end;margin-top:14px;flex-wrap:wrap}
+.estr button{background:none;border:0;font-size:2rem;color:#C9C3B0;cursor:pointer;padding:0 2px}
+.estr button.on{color:#C08A1E}
+.ok-ic{width:60px;height:60px;border-radius:50%;background:var(--fern);color:#fff;display:flex;align-items:center;justify-content:center;font-size:2rem;margin:0 auto 12px}
+.sample{display:grid;grid-template-columns:repeat(3,1fr);gap:10px}
+.sample button{border:1.5px solid var(--sage);border-radius:12px;background:var(--cream);padding:8px;cursor:pointer}
+.sample svg{width:100%}
+#toast{position:fixed;bottom:24px;left:50%;transform:translateX(-50%) translateY(30px);background:var(--pine);color:#fff;padding:11px 22px;border-radius:99px;opacity:0;pointer-events:none;transition:.25s;z-index:60;box-shadow:var(--sh);max-width:92vw;text-align:center}
+#toast.on{opacity:1;transform:translateX(-50%) translateY(0)}
+
+/* Vendedor */
+.vhead{display:flex;justify-content:space-between;gap:14px;flex-wrap:wrap;align-items:center;margin-bottom:14px}
+.tabs{display:flex;gap:4px;border-bottom:2px solid var(--dust);margin-bottom:18px;flex-wrap:wrap}
+.tabs button{background:none;border:0;padding:10px 18px;cursor:pointer;border-bottom:3px solid transparent;margin-bottom:-2px;font-weight:600;color:var(--muted)}
+.tabs button.on{color:var(--pine);border-color:var(--fern)}
+.kpi{text-align:center}
+.kpi b{display:block;font-family:Georgia,serif;font-size:1.9rem;color:var(--pine)}
+.up{color:var(--fern);font-weight:700;font-size:.85rem}
+.ord{display:grid;grid-template-columns:70px 1fr 90px 110px 150px 170px;gap:10px;align-items:center;padding:11px 4px;border-bottom:1px solid var(--line);font-size:.92rem}
+.ord.h{font-weight:700;color:var(--muted);font-size:.78rem;text-transform:uppercase;letter-spacing:.04em}
+.est{font-size:.75rem;font-weight:700;border-radius:99px;padding:3px 10px;display:inline-block;text-align:center}
+.e-pago{background:#F7E7C9;color:#7a4e0c}.e-env{background:#DCE8F3;color:#24507a}.e-rec{background:#E6EAD8;color:var(--hunter)}.e-ok{background:var(--fern);color:#fff}
+.cat{display:grid;grid-template-columns:54px 1fr 110px 80px 90px 190px;gap:12px;align-items:center;padding:9px 4px;border-bottom:1px solid var(--line);font-size:.92rem}
+.cat .th{background:var(--dust);border-radius:10px;height:46px;display:flex;align-items:center;justify-content:center}
+.cat .th svg{height:36px;width:auto}
+.bars{display:flex;gap:18px;align-items:flex-end;height:170px;padding:10px 6px 0;border-bottom:2px solid var(--dust)}
+.bar{flex:1;display:flex;flex-direction:column;justify-content:flex-end;align-items:center;height:100%;gap:4px}
+.bar i{display:block;width:100%;max-width:70px;background:linear-gradient(var(--fern),var(--hunter));border-radius:8px 8px 0 0}
+.bar b{font-size:.95rem}
+.hb{height:12px;border-radius:99px;background:var(--dust);overflow:hidden;display:flex}
+.hb i{display:block;height:100%}
+.lock{text-align:center;padding:44px 20px;background:repeating-linear-gradient(45deg,#fff,#fff 12px,#f7f5ee 12px,#f7f5ee 24px)}
+.lock .ic{font-size:2.6rem}
+.alerta{background:#FBF0D9;border:1px solid #E8CC8E;border-radius:12px;padding:10px 14px;margin-bottom:12px;font-size:.9rem}
+
+@media (max-width:820px){
+ h1{font-size:1.6rem}
+ .ficha,.g2,.g3{grid-template-columns:1fr}
+ .ord{grid-template-columns:1fr 1fr;}.ord.h{display:none}
+ .cat{grid-template-columns:54px 1fr 1fr}
+ .sw{margin-left:0}
+ .hero{padding:20px}
+}
+@media print{
+ header.top,footer,.no-print,.tabs,#toast{display:none!important}
+ body{background:#fff}.card{box-shadow:none;border:1px solid #ccc}
+}
+</style>
+</head>
+<body>
+<header class="top"><div class="wrap" id="hdr"></div></header>
+<main><div class="wrap" id="app"></div></main>
+<footer><div class="wrap">
+ <span>Prototipo (MVP) con datos de ejemplo · La búsqueda se simula con reglas; la IA (Gemini) es parte del roadmap.</span>
+ <button data-act="reiniciar" title="Vuelve todo al estado inicial">Reiniciar demo</button>
+</div></footer>
+<div id="modal"></div>
+<div id="toast" role="status"></div>
+
+<script>
+'use strict';
+/* =====================================================================
+   PeaCorp · Prototipo MVP — todo en un solo archivo, sin dependencias.
+   1) Datos de ejemplo (fáciles de editar)   2) Utilidades
+   3) Búsqueda simulada con reglas           4) Vistas
+   5) Modales                                6) Eventos
+   ===================================================================== */
+
+/* ---------- 1. DATOS DE EJEMPLO ---------- */
+
+// Planes de tienda (precios mensuales en COP). "rank" = desempate (0 va primero).
+const PLANES = {
+  Emprende:{precio:0,    limite:5,        pos:'Estándar',   etq:'',            rank:2, informe:false, pedidos:'Básica'},
+  Impulsa: {precio:40000,limite:30,       pos:'Prioritario',etq:'Prioritario', rank:1, informe:false, pedidos:'Completa'},
+  Crece:   {precio:90000,limite:Infinity, pos:'Destacado',  etq:'Destacado',   rank:0, informe:true,  pedidos:'Completa + múltiples sedes'}
+};
+
+// Tiendas ficticias de Cúcuta. nivel: Identificado (1) | Verificado (2). x,y = posición en el mapa simple.
+const TIENDAS = [
+  {id:1,nombre:'Lino & Co',        barrio:'Centro',         dir:'Av. 5 #10-25, Centro',          tel:'300 000 1001',horario:'Lun–Sáb 9–6',  km:1.2,nivel:'Verificado',  plan:'Crece',   x:62,y:40},
+  {id:2,nombre:'Taller Norte',     barrio:'Caobos',         dir:'Calle 14N #3-40, Caobos',       tel:'300 000 1002',horario:'Lun–Sáb 10–7', km:3.4,nivel:'Verificado',  plan:'Impulsa', x:38,y:17},
+  {id:3,nombre:'Moda Cúcuta',      barrio:'Latino',         dir:'Cra 3 #8-12, Latino',           tel:'300 000 1003',horario:'Lun–Sáb 9–7',  km:2.1,nivel:'Identificado',plan:'Emprende',x:27,y:48},
+  {id:4,nombre:'Sol Andino',       barrio:'Quinta Oriental',dir:'Calle 9 #22-10, Quinta Oriental',tel:'300 000 1004',horario:'Mar–Dom 10–7', km:4.8,nivel:'Identificado',plan:'Impulsa', x:81,y:21},
+  {id:5,nombre:'Hilos del Norte',  barrio:'Atalaya',        dir:'Av. 11E #4-30, Atalaya',        tel:'300 000 1005',horario:'Lun–Vie 9–5',  km:6.3,nivel:'Verificado',  plan:'Emprende',x:14,y:61}
+];
+
+// Productos. tipo: camisa|pantalon|vestido|bermuda|falda. colores[0] = color principal.
+const PRODUCTOS = [
+ {id:1, nombre:'Camisa de lino manga larga',  tienda:1,precio:65000, tela:'lino',   pais:'Colombia',tallas:['S','M','L','XL'],     colores:['blanco','beige'],  tipo:'camisa',  estilo:'casual',    stock:14,cal:4.8,res:126,online:true,fisico:true,estado:'Publicado',desc:'Camisa fresca de manga larga, ideal para el calor de Cúcuta. Se ve formal y se siente liviana.'},
+ {id:2, nombre:'Pantalón de lino recto',      tienda:1,precio:89000, tela:'lino',   pais:'Colombia',tallas:['30','32','34','36'],  colores:['beige','negro'],   tipo:'pantalon',estilo:'casual',    stock:9, cal:4.7,res:88, online:true,fisico:true,estado:'Publicado',desc:'Corte recto y caída suave. Combina con camisa de lino para un look de oficina relajada.'},
+ {id:3, nombre:'Camisa lino slim beige',      tienda:2,precio:72000, tela:'lino',   pais:'Colombia',tallas:['S','M','L'],          colores:['beige'],           tipo:'camisa',  estilo:'slim',      stock:11,cal:4.6,res:54, online:true,fisico:true,estado:'Publicado',desc:'Ajuste slim en lino color beige. Tela transpirable y acabado de taller.'},
+ {id:4, nombre:'Camisa de lino casual',       tienda:3,precio:58000, tela:'lino',   pais:'Colombia',tallas:['M','L','XL'],         colores:['beige','azul'],    tipo:'camisa',  estilo:'casual',    stock:8, cal:4.3,res:19, online:false,fisico:true,estado:'Publicado',desc:'Camisa casual de lino para el día a día. Corte holgado y botones de coco.'},
+ {id:5, nombre:'Vestido largo verde para graduación',tienda:4,precio:185000,tela:'mezcla',pais:'Colombia',tallas:['S','M','L'],  colores:['verde'],           tipo:'vestido', estilo:'graduación',largo:'largo',stock:5, cal:4.9,res:31, online:true,fisico:true,estado:'Publicado',desc:'Vestido largo verde con caída elegante, pensado para graduaciones y eventos de gala.'},
+ {id:6, nombre:'Vestido largo de lino verde', tienda:1,precio:135000,tela:'lino',   pais:'Colombia',tallas:['S','M','L'],          colores:['verde','beige'],   tipo:'vestido', estilo:'casual',    largo:'largo',stock:7, cal:4.6,res:42, online:true,fisico:true,estado:'Publicado',desc:'Vestido largo y fresco en lino, para paseos y almuerzos en familia.'},
+ {id:7, nombre:'Vestido corto floral',        tienda:3,precio:79000, tela:'algodón',pais:'Colombia',tallas:['S','M','L'],          colores:['terracota'],       tipo:'vestido', estilo:'casual',    largo:'corto',stock:6, cal:4.2,res:15, online:false,fisico:true,estado:'Publicado',desc:'Vestido corto de algodón con estampado floral. Ligero y cómodo.'},
+ {id:8, nombre:'Vestido midi negro',          tienda:2,precio:98000, tela:'mezcla', pais:'Colombia',tallas:['S','M','L','XL'],     colores:['negro'],           tipo:'vestido', estilo:'elegante',  largo:'midi', stock:10,cal:4.5,res:37, online:true,fisico:true,estado:'Publicado',desc:'Midi negro versátil: sirve para la oficina o para una cena.'},
+ {id:9, nombre:'Pantalón jogger de algodón',  tienda:2,precio:69000, tela:'algodón',pais:'Colombia',tallas:['S','M','L','XL'],     colores:['gris','negro'],    tipo:'pantalon',estilo:'deportivo', stock:12,cal:4.4,res:40, online:true,fisico:true,estado:'Publicado',desc:'Jogger de algodón con puño elástico. Cómodo para todo el día.'},
+ {id:10,nombre:'Pantalón de lino ancho',      tienda:2,precio:95000, tela:'lino',   pais:'Colombia',tallas:['30','32','34','36'],  colores:['beige','blanco'],  tipo:'pantalon',estilo:'casual',    stock:6, cal:4.5,res:23, online:true,fisico:true,estado:'Publicado',desc:'Pierna ancha y tiro alto en lino. Muy fresco para clima cálido.'},
+ {id:11,nombre:'Pantalón de lino cintura elástica',tienda:5,precio:78000,tela:'lino',pais:'Colombia',tallas:['S','M','L'],          colores:['beige','verde'],   tipo:'pantalon',estilo:'casual',    stock:9, cal:4.4,res:12, online:true,fisico:false,estado:'Publicado',desc:'Pantalón de lino con cintura elástica y cordón. Comodidad sin perder estilo.'},
+ {id:12,nombre:'Pantalón jean slim',          tienda:4,precio:110000,tela:'mezcla', pais:'Perú',    tallas:['30','32','34','36'],  colores:['azul'],            tipo:'pantalon',estilo:'slim',      stock:15,cal:4.3,res:60, online:true,fisico:true,estado:'Publicado',desc:'Jean slim de mezcla elástica con lavado medio.'},
+ {id:13,nombre:'Bermuda de lino beige',       tienda:1,precio:62000, tela:'lino',   pais:'Colombia',tallas:['S','M','L','XL'],     colores:['beige','azul'],    tipo:'bermuda', estilo:'casual',    stock:8, cal:4.7,res:51, online:true,fisico:true,estado:'Publicado',desc:'Bermuda de lino a la rodilla, perfecta para tierra caliente.'},
+ {id:14,nombre:'Bermuda cargo de algodón',    tienda:3,precio:54000, tela:'algodón',pais:'Colombia',tallas:['M','L','XL'],         colores:['verde','gris'],    tipo:'bermuda', estilo:'casual',    stock:10,cal:4.1,res:22, online:false,fisico:true,estado:'Publicado',desc:'Bermuda cargo con bolsillos laterales y tela resistente.'},
+ {id:15,nombre:'Bermuda deportiva',           tienda:5,precio:45000, tela:'mezcla', pais:'China',   tallas:['S','M','L','XL'],     colores:['negro','azul'],    tipo:'bermuda', estilo:'deportivo', stock:20,cal:4.0,res:33, online:true,fisico:false,estado:'Publicado',desc:'Bermuda deportiva de secado rápido.'},
+ {id:16,nombre:'Falda midi plisada',          tienda:4,precio:76000, tela:'mezcla', pais:'Colombia',tallas:['S','M','L'],          colores:['terracota','verde'],tipo:'falda',  estilo:'elegante',  largo:'midi', stock:7, cal:4.6,res:28, online:true,fisico:true,estado:'Publicado',desc:'Falda midi plisada con mucho movimiento.'},
+ {id:17,nombre:'Falda larga de lino',         tienda:1,precio:84000, tela:'lino',   pais:'Colombia',tallas:['S','M','L'],          colores:['beige'],           tipo:'falda',   estilo:'casual',    largo:'largo',stock:0, cal:4.7,res:39, online:true,fisico:true,estado:'Publicado',desc:'Falda larga de lino con cintura alta.'},
+ {id:18,nombre:'Camisa oversize de algodón',  tienda:2,precio:59000, tela:'algodón',pais:'Colombia',tallas:['S','M','L','XL'],     colores:['blanco','negro'],  tipo:'camisa',  estilo:'oversize',  stock:14,cal:4.5,res:47, online:true,fisico:true,estado:'Publicado',desc:'Camisa oversize de algodón grueso. Se usa suelta o por dentro.'},
+ {id:19,nombre:'Camisa básica de algodón',    tienda:1,precio:49000, tela:'algodón',pais:'Colombia',tallas:['S','M','L','XL'],     colores:['blanco','negro','azul'],tipo:'camisa',estilo:'casual',  stock:25,cal:4.4,res:77, online:true,fisico:true,estado:'Publicado',desc:'La camisa de todos los días, en tres colores.'},
+ {id:20,nombre:'Camisa de lino cuello mao',   tienda:1,precio:68000, tela:'lino',   pais:'Colombia',tallas:['M','L'],              colores:['blanco'],          tipo:'camisa',  estilo:'casual',    stock:6, cal:0,  res:0,  online:true,fisico:true,estado:'Borrador', desc:'Camisa de lino con cuello mao (aún en preparación).'}
+];
+
+// Pedidos iniciales de la tienda demo (Lino & Co). canal: online | tienda
+const PEDIDOS_INICIALES = [
+  {id:1048,pid:null,tienda:1,label:'Camisa de lino · M', qty:1,total:65000, canal:'online',estado:'Por enviar',       mine:false},
+  {id:1049,pid:null,tienda:1,label:'Pantalón de lino · 32',qty:1,total:89000,canal:'tienda',estado:'Recoger en tienda',mine:false},
+  {id:1050,pid:null,tienda:1,label:'Camisa slim · L',    qty:2,total:144000,canal:'online',estado:'Pago por confirmar',mine:false}
+];
+
+// Colores de producto → hex (para pintar las prendas SVG)
+const COLORES = {beige:'#D9C7A3',blanco:'#F5F3EC',negro:'#2E2E2E',verde:'#4F7A52',azul:'#4A6FA5',gris:'#9AA09A',terracota:'#C26A4A',mostaza:'#D9A441',rojo:'#B5453A'};
+
+/* ---------- 2. ESTADO Y UTILIDADES ---------- */
+const clone = o => JSON.parse(JSON.stringify(o));
+function estadoInicial(){
+  return {
+    modo:'comprador',            // comprador | tienda
+    vista:'buscar', param:null,  // buscar | ficha | tienda | explorar | pedidos
+    busqueda:{draft:'',texto:'',filtros:{},tokens:[]},
+    tiendas:clone(TIENDAS), productos:clone(PRODUCTOS), pedidos:clone(PEDIDOS_INICIALES),
+    resenas:[], proxPedido:1051, proxProd:21,
+    planDemo:'Crece', tab:'resumen', talla:null, reporte:null, qtienda:'', modal:null
+  };
+}
+let state = estadoInicial();
+
+const $ = s => document.querySelector(s);
+const norm = s => String(s).toLowerCase().normalize('NFD').replace(/[\u0300-\u036f]/g,'');
+const esc = s => String(s).replace(/[&<>"']/g,c=>({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'}[c]));
+const fmt = n => '$' + String(Math.round(n)).replace(/\B(?=(\d{3})+(?!\d))/g,'.');   // formato colombiano
+const tienda = id => state.tiendas.find(t=>t.id===id);
+const producto = id => state.productos.find(p=>p.id===id);
+const visible = p => p.estado==='Publicado' && p.stock>0;
+const km = n => n.toFixed(1).replace('.',',') + ' km';
+const cap = s => s.charAt(0).toUpperCase()+s.slice(1);
+
+let toastT;
+function toast(msg){const t=$('#toast');t.textContent=msg;t.classList.add('on');clearTimeout(toastT);toastT=setTimeout(()=>t.classList.remove('on'),3200);}
+
+/* ---------- Imágenes SVG ---------- */
+function sombra(hex,f){const n=parseInt(hex.slice(1),16);return '#'+[(n>>16)&255,(n>>8)&255,n&255].map(v=>Math.round(v*f).toString(16).padStart(2,'0')).join('');}
+// Dibuja la prenda (camisa, pantalón, vestido, bermuda, falda) pintada con el color del producto
+function prenda(tipo,color,largo){
+  const c=COLORES[color]||'#A3B18A', d=sombra(c,.68); let s='';
+  if(tipo==='camisa'){
+    s=`<path d="M30 16 L43 11 Q50 20 57 11 L70 16 L91 36 L81 47 L72 40 L72 90 L28 90 L28 40 L19 47 L9 36 Z"/>
+       <path d="M43 11 L50 27 L57 11" fill="none"/><path d="M50 27 L50 90" fill="none" stroke-dasharray="2 3"/>
+       <circle cx="50" cy="40" r="1.3" fill="${d}"/><circle cx="50" cy="54" r="1.3" fill="${d}"/><circle cx="50" cy="68" r="1.3" fill="${d}"/>`;
+  }else if(tipo==='pantalon'){
+    s=`<path d="M30 8 L70 8 L74 92 L55 92 L50 36 L45 92 L26 92 Z"/><path d="M30 15 L70 15" fill="none"/><path d="M50 15 L50 36" fill="none"/>`;
+  }else if(tipo==='vestido'){
+    const b=largo==='corto'?66:largo==='midi'?82:94;
+    s=`<path d="M38 8 L45 8 L50 17 L55 8 L62 8 L61 38 L${80-(94-b)*.2} ${b} L${20+(94-b)*.2} ${b} L39 38 Z"/><path d="M39 38 L61 38" fill="none"/>`;
+  }else if(tipo==='bermuda'){
+    s=`<path d="M28 20 L72 20 L76 64 L55 64 L50 40 L45 64 L24 64 Z"/><path d="M28 27 L72 27" fill="none"/>`;
+  }else{ // falda
+    const b=largo==='corto'?62:largo==='midi'?78:90;
+    s=`<path d="M36 20 L64 20 L${82+(b-78)*.2} ${b} L${18-(b-78)*.2} ${b} Z"/><path d="M36 28 L64 28" fill="none"/>`;
+  }
+  return `<svg viewBox="0 0 100 100" xmlns="http://www.w3.org/2000/svg" aria-hidden="true"><g fill="${c}" stroke="${d}" stroke-width="1.7" stroke-linejoin="round" stroke-linecap="round">${s}</g></svg>`;
+}
+// Logo oficial de PeaCorp (PNG incrustado en base64, sin archivos externos)
+const LOGO_B64 = 'data:image/png;base64,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';
+function logo(sz){
+  return `<img src="${LOGO_B64}" width="${sz}" height="${sz}" alt="Logo de PeaCorp" style="display:block">`;
+}
+// Mapa simple (SVG): calles, tiendas y punto "Tú"
+function mapa(lista,foco){
+  const pts=lista.map(t=>`<g data-act="tienda" data-id="${t.id}" style="cursor:pointer"><title>${esc(t.nombre)} · ${km(t.km)}</title>
+    <circle cx="${t.x}" cy="${t.y}" r="${t.id===foco?4.6:3.4}" fill="${t.nivel==='Verificado'?'#588157':'#A3B18A'}" stroke="#344E41" stroke-width="1"/>
+    <text x="${t.x}" y="${t.y-5.5}" font-size="3.3" text-anchor="middle" fill="#344E41" font-weight="700">${esc(t.nombre)}</text></g>`).join('');
+  return `<svg class="mapa" viewBox="0 0 100 72" role="img" aria-label="Mapa simple de tiendas">
+   <rect width="100" height="72" fill="#E7E4D8"/><rect x="62" y="48" width="30" height="18" rx="4" fill="#C9D4B4"/>
+   <g stroke="#fff" stroke-width="2.2" fill="none"><path d="M0 30 H100"/><path d="M0 56 H100"/><path d="M20 0 V72"/><path d="M48 0 V72"/><path d="M76 0 V72"/><path d="M0 8 L100 20" stroke-width="1.3"/></g>
+   ${pts}
+   <circle cx="50" cy="44" r="7" fill="#344E41" opacity=".15"/><circle cx="50" cy="44" r="3" fill="#344E41" stroke="#fff" stroke-width="1"/>
+   <text x="50" y="52" font-size="3.3" text-anchor="middle" fill="#344E41" font-weight="700">Tú</text></svg>`;
+}
+
+/* ---------- Piezas de interfaz ---------- */
+const badge = n => n==='Verificado'
+  ? `<span class="bd v" title="Nivel 2: ubicación, teléfono y registro legal validados">✓ Verificado</span>`
+  : `<span class="bd i" title="Nivel 1: ubicación y teléfono validados">● Identificado</span>`;
+const etiquetaPlan = t => { const e=PLANES[t.plan].etq; return e?`<span class="tag ${e==='Destacado'?'dest':'prio'}">${e}</span>`:''; };
+function estrellas(p){
+  if(!p.res) return '<span class="muted small">Sin reseñas aún</span>';
+  const n=Math.round(p.cal);
+  return `<span class="stars" aria-label="${p.cal.toFixed(1)} de 5">${'★'.repeat(n)}${'☆'.repeat(5-n)}</span> <b>${p.cal.toFixed(1)}</b> <span class="muted">· ${p.res} reseñas</span>`;
+}
+function tarjeta(p){
+  const t=tienda(p.tienda);
+  return `<article class="card prod" data-act="ficha" data-id="${p.id}" tabindex="0" role="button" aria-label="Ver ${esc(p.nombre)}">
+   <div class="img">${prenda(p.tipo,p.colores[0],p.largo)}${etiquetaPlan(t)}</div>
+   <div class="body"><h3>${esc(p.nombre)}</h3><div class="precio">${fmt(p.precio)}</div>
+    <div class="small">${esc(t.nombre)} ${badge(t.nivel)}</div>
+    <div class="small">${estrellas(p)}</div>
+    <div class="small muted">${esc(t.barrio)} · ${km(t.km)}</div>
+    <div class="tags">${p.online?'<span class="tg">En línea</span>':''}${p.fisico?'<span class="tg">En tienda</span>':''}</div></div></article>`;
+}
+
+/* ---------- 3. BÚSQUEDA SIMULADA CON REGLAS (sin IA real) ---------- */
+const TIPOS_RE = [['camisa',/\b(camisas?|camisetas?|blusas?)\b/],['pantalon',/\b(pantalon(es)?|jeans?)\b/],['vestido',/\bvestidos?\b/],['bermuda',/\b(bermudas?|shorts?)\b/],['falda',/\bfaldas?\b/]];
+const COLOR_RE = [['beige',/\b(beige|crema|arena)\b/],['verde',/\b(verde|esmeralda)\b/],['negro',/\bnegr[oa]s?\b/],['blanco',/\bblanc[oa]s?\b/],['azul',/\bazul(es)?\b/],['gris',/\bgris(es)?\b/],['terracota',/\b(terracota|naranja)\b/],['mostaza',/\b(mostaza|amarill[oa])\b/],['rojo',/\broj[oa]s?\b/]];
+const ESTILO_RE = [['graduación',/\b(graduacion|grado|grados)\b/],['oficina',/\b(oficina|trabajo)\b/],['elegante',/\b(elegante|gala|fiesta|matrimonio)\b/],['casual',/\bcasual\b/],['oversize',/\boversize\b/],['slim',/\bslim\b/],['deportivo',/\b(deportiv[oa]|deporte|gym)\b/]];
+const STOP = new Set(['busco','quiero','necesito','unas','unos','para','con','por','los','las','del','talla','tallas','hasta','menos','algo','cerca','mismo','como','muy','tipo','tengo','dame','mostrar','mil']);
+
+// Interpreta una frase en lenguaje natural y devuelve filtros + palabras sueltas
+function interpretar(texto){
+  const t=' '+norm(texto)+' ', f={};
+  for(const [k,re] of TIPOS_RE) if(re.test(t)){f.tipo=k;break;}
+  for(const [k,re] of COLOR_RE) if(re.test(t)){f.color=k;break;}
+  const mt=t.match(/\btallas?\s*(xxl|xl|xs|s|m|l|\d{2})\b/); if(mt) f.talla=mt[1].toUpperCase();
+  if(/\blino\b/.test(t)) f.tela='lino'; else if(/\balgodon\b/.test(t)) f.tela='algodón'; else if(/\b(mezcla|satin|poliester)\b/.test(t)) f.tela='mezcla';
+  const mp=t.match(/\b(?:hasta|menos de|maximo|max|por debajo de|no mas de)\s*\$?\s*([\d.,]+)\s*(mil|k)?\b/);
+  if(mp){let n=parseInt(mp[1].replace(/[.,]/g,''),10); if(!isNaN(n)){ if(mp[2]||n<1000) n*=1000; f.max=n; }}
+  if(/\b(cerca|cercano|cercanas?|cerquita)\b/.test(t)) f.cerca=true;
+  if(/\blarg[oa]s?\b/.test(t)) f.largo='largo'; else if(/\bcort[oa]s?\b/.test(t)) f.largo='corto'; else if(/\bmidi\b/.test(t)) f.largo='midi';
+  if(f.largo && ['camisa','pantalon','bermuda'].includes(f.tipo)) delete f.largo;   // "manga larga" no es largo de vestido
+  for(const [k,re] of ESTILO_RE) if(re.test(t)){f.estilo=k;break;}
+  const mpa=t.match(/\b(?:fabricad[oa]s?|hech[oa]s?)\s+en\s+(colombia|peru|china)\b/); if(mpa) f.pais={colombia:'Colombia',peru:'Perú',china:'China'}[mpa[1]];
+  const tokens=t.replace(/[^a-z0-9\s]/g,' ').split(/\s+/).filter(w=>w.length>=4&&!STOP.has(w)&&!/^\d+$/.test(w)).map(w=>w.length>4&&w.endsWith('s')?w.slice(0,-1):w);
+  return {filtros:f,tokens};
+}
+const textoProd = p => norm([p.nombre,p.desc,p.estilo,p.tela,p.tipo,p.colores.join(' ')].join(' '));
+
+// Filtros duros: lo que el usuario pidió explícitamente debe cumplirse
+function coincide(p,f,tokens){
+  const t=tienda(p.tienda);
+  if(f.tipo&&p.tipo!==f.tipo) return false;
+  if(f.color&&!p.colores.includes(f.color)) return false;
+  if(f.talla&&!p.tallas.includes(f.talla)) return false;
+  if(f.tela&&p.tela!==f.tela) return false;
+  if(f.largo&&p.largo!==f.largo) return false;
+  if(f.max&&p.precio>f.max) return false;
+  if(f.pais&&p.pais!==f.pais) return false;
+  if(f.cerca&&t.km>3.5) return false;
+  if(!Object.keys(f).length&&tokens.length){const tx=textoProd(p);return tokens.some(k=>tx.includes(k));}
+  return true;
+}
+// Puntaje de RELEVANCIA (el plan NO suma aquí: solo desempata después)
+function relevancia(p,f,tokens){
+  let s=0;
+  if(f.tipo)s+=40; if(f.color)s+=p.colores[0]===f.color?20:10; if(f.tela)s+=20; if(f.talla)s+=15;
+  if(f.largo)s+=15; if(f.max)s+=5; if(f.pais)s+=5; if(f.cerca)s+=5;
+  if(f.estilo&&p.estilo===f.estilo)s+=25;
+  const nm=norm(p.nombre), tx=textoProd(p);
+  tokens.forEach(k=>{ if(nm.includes(k))s+=3; else if(tx.includes(k))s+=1; });
+  return s;
+}
+// Orden final: relevancia ↓, luego plan (Crece → Impulsa → Emprende), luego calificación
+function buscar(){
+  const {filtros:f,tokens}=state.busqueda;
+  return state.productos.filter(p=>visible(p)&&coincide(p,f,tokens))
+    .map(p=>({p,s:relevancia(p,f,tokens)}))
+    .sort((a,b)=>b.s-a.s || PLANES[tienda(a.p.tienda).plan].rank-PLANES[tienda(b.p.tienda).plan].rank || b.p.cal-a.p.cal)
+    .map(x=>x.p);
+}
+function lanzarBusqueda(texto){
+  const b=state.busqueda; b.draft=texto; b.texto=texto.trim();
+  if(b.texto){const r=interpretar(b.texto); b.filtros=r.filtros; b.tokens=r.tokens;} else {b.filtros={};b.tokens=[];}
+  state.vista='buscar'; render();
+}
+const CHIP = {tipo:v=>`prenda = ${v}`,color:v=>`color = ${v}`,talla:v=>`talla = ${v}`,tela:v=>`tela = ${v}`,max:v=>`precio máx. = ${fmt(v)}`,cerca:()=>'ubicación = cerca de ti',largo:v=>`largo = ${v}`,estilo:v=>`ocasión = ${v}`,pais:v=>`fabricada en = ${v}`};
+
+/* ---------- 4. VISTAS ---------- */
+function ir(v,p){state.vista=v;state.param=p===undefined?null:p;render();window.scrollTo(0,0);}
+
+function renderHeader(){
+  const mios=state.pedidos.filter(o=>o.mine).length, esT=state.modo==='tienda';
+  $('#hdr').innerHTML=`<button class="brand" data-act="logo" aria-label="PeaCorp inicio">${logo(36)}PeaCorp</button>
+   ${esT?'<span class="modo-tag">Vista del vendedor</span>':`<nav class="nav">
+     <button data-act="nav" data-v="buscar" class="${['buscar','ficha','tienda'].includes(state.vista)?'on':''}">Buscar</button>
+     <button data-act="nav" data-v="explorar" class="${state.vista==='explorar'?'on':''}">Explorar</button>
+     <button data-act="nav" data-v="pedidos" class="${state.vista==='pedidos'?'on':''}">Mis pedidos${mios?`<span class="n">${mios}</span>`:''}</button></nav>`}
+   <div class="sw"><span>Soy una tienda</span><button class="switch" role="switch" aria-checked="${esT}" aria-label="Soy una tienda" data-act="modo"></button></div>`;
+}
+
+/* --- Buscador y resultados (inicio) --- */
+function vBuscar(){
+  const b=state.busqueda, f=b.filtros, res=buscar();
+  const chips=Object.keys(f).map(k=>`<span class="chip">${esc(CHIP[k](f[k]))}<button data-act="quitar" data-k="${k}" aria-label="Quitar filtro">×</button></span>`).join('');
+  const tk=!Object.keys(f).length&&b.tokens.length?`<span class="chip">palabras = ${esc(b.tokens.join(', '))}<button data-act="quitar" data-k="tokens" aria-label="Quitar">×</button></span>`:'';
+  const sel=(k,arr)=>arr.map(x=>`<option ${f[k]===x?'selected':''}>${x}</option>`).join('');
+  return `<section class="hero"><h1>Encuentra moda de Cúcuta, en un solo lugar</h1>
+   <p>Escribe lo que buscas como se lo dirías a una persona. <em>Lo de siempre, impulsado por tecnología.</em></p>
+   <form class="sform" data-form="buscar"><input id="q" name="q" value="${esc(b.draft)}" placeholder="Ej: camisa de lino beige talla M" autocomplete="off" aria-label="Buscar en lenguaje natural">
+     <button type="button" class="cam" data-act="camara" title="Buscar por imagen (simulado)" aria-label="Buscar por imagen">📷</button>
+     <button class="btn" type="submit" style="background:var(--sage);color:var(--pine)">Buscar</button></form>
+   <div class="ejs"><span>Prueba:</span>
+    <button data-act="ejemplo" data-q="busco un vestido verde largo para graduación">vestido verde largo para graduación</button>
+    <button data-act="ejemplo" data-q="camisa de lino beige talla M">camisa de lino beige talla M</button>
+    <button data-act="ejemplo" data-q="pantalón de lino hasta 90 mil">pantalón de lino hasta 90 mil</button></div></section>
+   <div class="filtros">
+    <label>Talla<select data-f="talla"><option value="">Todas</option>${sel('talla',['S','M','L','XL','30','32','34','36'])}</select></label>
+    <label>Tela<select data-f="tela"><option value="">Todas</option>${sel('tela',['lino','algodón','mezcla'])}</select></label>
+    <label>Precio máximo ($)<input type="number" data-f="max" min="0" step="5000" placeholder="Sin límite" value="${f.max||''}"></label>
+    <label>Fabricada en<select data-f="pais"><option value="">Cualquiera</option>${sel('pais',['Colombia','Perú','China'])}</select></label>
+    <label class="chk"><input type="checkbox" data-f="cerca" ${f.cerca?'checked':''}> Cerca de mí</label>
+    ${(chips||tk)?'<button class="link" data-act="limpiar" style="padding-bottom:10px">Limpiar todo</button>':''}</div>
+   ${(chips||tk)?`<div class="entendi"><b>Entendí:</b> ${chips}${tk}</div>`:''}
+   <div class="rhead"><h2 style="margin:0">${res.length} resultado${res.length===1?'':'s'}</h2>
+    <span class="small muted">Ordenados por relevancia. El plan de la tienda solo desempata. · <button class="link" data-act="reportar">Reportar resultado erróneo</button></span></div>
+   ${res.length?`<div class="grid g4">${res.map(tarjeta).join('')}</div>`
+   :`<div class="card vacio"><div class="big">🔎</div><h3>No encontramos coincidencias exactas</h3>
+     <p class="muted">Puede que ese filtro sea muy específico. Prueba quitando alguna ficha (por ejemplo la talla o el precio) o describe la prenda de otra forma.</p>
+     <button class="btn" data-act="limpiar">Ver toda la moda local</button></div>`}`;
+}
+
+/* --- Ficha del producto --- */
+function vFicha(){
+  const p=producto(state.param); if(!p) return '<p>Producto no encontrado.</p>';
+  const t=tienda(p.tienda);
+  const pend=state.pedidos.find(o=>o.mine&&o.pid===p.id&&o.estado==='Entregado'&&!o.resena);
+  const rs=state.resenas.filter(r=>r.pid===p.id);
+  return `<button class="link back" data-act="volver">← Volver a los resultados</button>
+  <div class="card ficha"><div class="img">${prenda(p.tipo,p.colores[0],p.largo)}</div>
+   <div><h1 style="font-size:1.8rem">${esc(p.nombre)}</h1>
+    <div class="precio" style="font-size:1.7rem">${fmt(p.precio)}</div>
+    <div style="margin:4px 0 8px">${estrellas(p)} ${etiquetaPlan(t)}</div>
+    <div class="tags" style="padding:0 0 4px">${p.online?'<span class="tg">En línea</span>':''}${p.fisico?'<span class="tg">En tienda</span>':''}</div>
+    <div class="vend"><div><b>${esc(t.nombre)}</b> ${badge(t.nivel)}<div class="small muted">Cúcuta · ${esc(t.barrio)} · ${km(t.km)}</div></div>
+     <button class="btn alt sm" data-act="tienda" data-id="${t.id}">Ir a la tienda</button></div>
+    <p>${esc(p.desc)}</p>
+    <h3>Ficha técnica</h3>
+    <table class="tec"><tr><td>Tela</td><td>${cap(p.tela)}</td></tr><tr><td>Fabricada en</td><td>${p.pais}</td></tr>
+     <tr><td>Colores</td><td>${p.colores.map(cap).join(', ')}</td></tr><tr><td>Estilo</td><td>${cap(p.estilo)}</td></tr>
+     <tr><td>Disponibles</td><td>${p.stock} unidades</td></tr></table>
+    <strong>Talla</strong><div class="tallas" style="margin:6px 0 4px">${p.tallas.map(x=>`<button class="${state.talla===x?'on':''}" data-act="talla" data-t="${x}">${x}</button>`).join('')}</div>
+    <div class="pago">El pago y la entrega se acuerdan directamente con la tienda.</div>
+    <div class="acc"><button class="btn" data-act="pedir" data-id="${p.id}" ${p.stock?'':'disabled'}>Hacer pedido</button>
+     <button class="btn alt" data-act="tienda" data-id="${t.id}">Ir a la tienda</button>
+     ${pend?`<button class="btn warn" data-act="resena" data-id="${pend.id}">Dejar reseña</button>`:''}</div></div></div>
+  <div class="card" style="margin-top:18px"><h3>Reseñas</h3>
+   <p class="small muted">Solo pueden reseñar quienes recibieron su pedido: la tienda lo marca como entregado y el comprador lo confirma.</p>
+   ${rs.length?rs.map(r=>`<div style="padding:8px 0;border-top:1px solid var(--line)"><span class="stars">${'★'.repeat(r.e)}${'☆'.repeat(5-r.e)}</span> <b>${esc(r.autor)}</b> <span class="muted small">· ${r.fecha}</span><div>${esc(r.txt||'(sin comentario)')}</div></div>`).join(''):'<p class="muted">Aún no hay reseñas nuevas en esta sesión.</p>'}</div>`;
+}
+
+/* --- Perfil de tienda --- */
+function vTienda(){
+  const t=tienda(state.param); if(!t) return '';
+  const ps=state.productos.filter(p=>p.tienda===t.id&&visible(p));
+  return `<button class="link back" data-act="volver">← Volver</button>
+  <div class="card grid g2" style="margin-bottom:18px"><div>
+    <h1 style="font-size:1.8rem">${esc(t.nombre)}</h1><p>${badge(t.nivel)} ${etiquetaPlan(t)}</p>
+    <table class="tec"><tr><td>Ciudad</td><td>Cúcuta · ${esc(t.barrio)}</td></tr><tr><td>Dirección</td><td>${esc(t.dir)}</td></tr>
+     <tr><td>Horario</td><td>${esc(t.horario)}</td></tr><tr><td>Teléfono</td><td>${esc(t.tel)}</td></tr><tr><td>Distancia</td><td>${km(t.km)} de ti</td></tr></table>
+    <p class="small muted">${t.nivel==='Verificado'?'Verificado (nivel 2): ubicación, teléfono y registro legal validados.':'Identificado (nivel 1): ubicación y teléfono validados.'}</p></div>
+   <div>${mapa([t],t.id)}</div></div>
+  <h2>Prendas de ${esc(t.nombre)} (${ps.length})</h2>
+  ${ps.length?`<div class="grid g4">${ps.map(tarjeta).join('')}</div>`:'<div class="card vacio muted">Esta tienda no tiene prendas disponibles ahora.</div>'}`;
+}
+
+/* --- Explorar cerca de ti --- */
+function vExplorar(){
+  const q=norm(state.qtienda||'');
+  const ts=state.tiendas.filter(t=>!q||norm(t.nombre+' '+t.barrio).includes(q)).sort((a,b)=>a.km-b.km);
+  const f=state.busqueda.filtros, base=state.productos.filter(visible);
+  let para, subt;
+  if(f.tipo||f.color||f.tela||f.estilo){
+    para=base.map(p=>({p,s:(f.tipo&&p.tipo===f.tipo?3:0)+(f.color&&p.colores.includes(f.color)?2:0)+(f.tela&&p.tela===f.tela?2:0)+(f.estilo&&p.estilo===f.estilo?1:0)}))
+      .filter(x=>x.s>0).sort((a,b)=>b.s-a.s||b.p.cal-a.p.cal).slice(0,4).map(x=>x.p);
+    subt='Según tu última búsqueda: '+Object.keys(f).map(k=>CHIP[k](f[k])).join(' · ');
+  }else{ para=[...base].sort((a,b)=>b.cal-a.cal).slice(0,4); subt='Aún no has buscado nada: te mostramos lo mejor valorado.'; }
+  const dest=base.filter(p=>tienda(p.tienda).plan==='Crece').sort((a,b)=>tienda(a.tienda).km-tienda(b.tienda).km||b.cal-a.cal).slice(0,4);
+  const cerca=[...base].sort((a,b)=>tienda(a.tienda).km-tienda(b.tienda).km||b.cal-a.cal).slice(0,8);
+  return `<h1>Explorar cerca de ti</h1><p class="muted">Tiendas y prendas de Cúcuta, ordenadas por distancia.</p>
+  <div class="grid g2" style="margin-bottom:22px"><div class="card"><div class="filtros" style="margin:0 0 10px"><label style="flex:1">Buscar tienda o barrio<input type="search" data-f="qtienda" value="${esc(state.qtienda)}" placeholder="Ej: Caobos" style="width:100%;border:1px solid var(--sage);border-radius:10px;padding:7px 10px"></label></div>
+    ${ts.length?ts.map(t=>`<div style="display:flex;justify-content:space-between;align-items:center;gap:8px;padding:9px 0;border-top:1px solid var(--line)"><div><b>${esc(t.nombre)}</b> ${badge(t.nivel)}<div class="small muted">${esc(t.barrio)} · ${esc(t.horario)}</div></div><div class="right"><b>${km(t.km)}</b><br><button class="link" data-act="tienda" data-id="${t.id}">Ver tienda</button></div></div>`).join(''):'<p class="muted">No hay tiendas con ese nombre o barrio.</p>'}</div>
+   <div class="card">${mapa(ts.length?ts:state.tiendas)}<p class="small muted" style="margin:8px 0 0">Mapa ilustrativo · toca una tienda para ver su perfil.</p></div></div>
+  <h2>Para ti · similares a lo que buscaste</h2><p class="small muted">${esc(subt)}</p><div class="grid g4" style="margin-bottom:26px">${para.map(tarjeta).join('')}</div>
+  <h2>Destacados cerca de ti</h2><p class="small muted">Prendas de tiendas con plan Crece, marcadas como Destacado.</p>
+  ${dest.length?`<div class="grid g4" style="margin-bottom:26px">${dest.map(tarjeta).join('')}</div>`:'<div class="card muted" style="margin-bottom:26px">Por ahora no hay tiendas destacadas.</div>'}
+  <h2>Prendas más cercanas</h2><div class="grid g4">${cerca.map(tarjeta).join('')}</div>`;
+}
+
+/* --- Mis pedidos (comprador) --- */
+const AMIGABLE = {'Pago por confirmar':'La tienda te contactará para confirmar el pago.','Por enviar':'La tienda confirmó el pago y prepara el envío.','Enviado':'Tu pedido va en camino.','Recoger en tienda':'Esperando que la tienda lo deje listo.','Listo para recoger':'¡Listo! Puedes recogerlo en la tienda.','Entregado':'La tienda marcó tu pedido como entregado.'};
+function vPedidos(){
+  const mios=state.pedidos.filter(o=>o.mine).sort((a,b)=>b.id-a.id);
+  return `<h1>Mis pedidos</h1><p class="muted">PeaCorp no cobra ni vende: el pago y la entrega se acuerdan directamente con cada tienda.</p>
+  ${mios.length?mios.map(o=>{const t=tienda(o.tienda);return `<div class="card" style="margin-bottom:14px;display:flex;gap:16px;align-items:center;flex-wrap:wrap">
+    <div class="img" style="width:90px;border-radius:12px;aspect-ratio:1">${prenda(producto(o.pid).tipo,producto(o.pid).colores[0],producto(o.pid).largo)}</div>
+    <div style="flex:1;min-width:220px"><b>Pedido #${o.id}</b> · ${esc(o.label)} ×${o.qty}<div class="small muted">${esc(t.nombre)} · ${o.canal==='tienda'?'Recoger en tienda':'Pedido en línea'} · ${fmt(o.total)}</div>
+     <div style="margin-top:4px"><span class="est ${claseEst(o.estado)}">${o.estado}</span> <span class="small">${AMIGABLE[o.estado]}</span></div>
+     ${o.tienda!==1?'<div class="small muted">Esta tienda no está en la demo del vendedor (usa Lino & Co para ver el flujo completo).</div>':''}</div>
+    ${o.estado==='Entregado'?(o.resena?`<span class="tg">Reseña enviada · ${'★'.repeat(o.resena)}</span>`:`<button class="btn warn" data-act="resena" data-id="${o.id}">Confirmar y dejar reseña</button>`):''}</div>`}).join('')
+  :`<div class="card vacio"><div class="big">🧺</div><h3>Aún no tienes pedidos</h3><p class="muted">Busca una prenda, ábrela y toca “Hacer pedido”.</p><button class="btn" data-act="nav" data-v="buscar">Ir a buscar</button></div>`}`;
+}
+
+/* --- Vista del vendedor (tienda demo: Lino & Co) --- */
+const claseEst = e => ({'Pago por confirmar':'e-pago','Por enviar':'e-env','Enviado':'e-env','Recoger en tienda':'e-rec','Listo para recoger':'e-rec','Entregado':'e-ok'}[e]||'');
+const SIG = {'Pago por confirmar':['Confirmar pago','Por enviar'],'Por enviar':['Marcar enviado','Enviado'],'Recoger en tienda':['Listo','Listo para recoger'],'Enviado':['Marcar entregado','Entregado'],'Listo para recoger':['Marcar entregado','Entregado']};
+const pedidosT = () => state.pedidos.filter(o=>o.tienda===1).sort((a,b)=>b.id-a.id);
+const accion = o => SIG[o.estado]?`<button class="btn sm" data-act="avanzar" data-id="${o.id}">${SIG[o.estado][0]}</button>`:'<span class="small muted">Completado ✓</span>';
+const filaPed = o => `<div class="ord"><b>#${o.id}</b><span>${esc(o.label)} ×${o.qty}</span><span>${fmt(o.total)}</span><span class="small">${o.canal==='tienda'?'Recoger en tienda':'En línea'}</span><span class="est ${claseEst(o.estado)}">${o.estado}</span><span>${accion(o)}</span></div>`;
+const cabPed = '<div class="ord h"><span>Pedido</span><span>Producto</span><span>Total</span><span>Canal</span><span>Estado</span><span>Acción</span></div>';
+
+function vVendedor(){
+  const t=tienda(1), pl=PLANES[t.plan];
+  const tabs=[['resumen','Resumen'],['catalogo','Catálogo'],['pedidos','Pedidos'],['informe','Informe']];
+  return `<div class="vhead"><div><h1 style="margin:0">${esc(t.nombre)}</h1><span class="bd v">✓ Negocio verificado · Nivel 2</span> <span class="tg">Plan ${state.planDemo}</span></div>
+   <label class="small" style="font-weight:600;color:var(--muted)">Ver como plan<br><select data-f="planDemo" style="border:1px solid var(--sage);border-radius:10px;padding:7px 10px;background:#fff">${['Emprende','Impulsa','Crece'].map(x=>`<option ${x===state.planDemo?'selected':''}>${x}</option>`).join('')}</select></label></div>
+  <div class="tabs">${tabs.map(([k,n])=>`<button class="${state.tab===k?'on':''}" data-act="tab" data-t="${k}">${n}${k==='pedidos'?` (${pedidosT().filter(o=>o.estado!=='Entregado').length})`:''}</button>`).join('')}</div>
+  ${{resumen:tResumen,catalogo:tCatalogo,pedidos:tPedidos,informe:tInforme}[state.tab]()}`;
+}
+function tResumen(){
+  const t=tienda(1), pl=PLANES[t.plan], pend=pedidosT().filter(o=>o.estado!=='Entregado');
+  return `<div class="grid g2" style="margin-bottom:18px">
+   <div class="card"><h3>Datos del negocio</h3><table class="tec"><tr><td>Nombre</td><td>${esc(t.nombre)}</td></tr><tr><td>Ciudad</td><td>Cúcuta · ${esc(t.barrio)}</td></tr><tr><td>Dirección</td><td>${esc(t.dir)}</td></tr><tr><td>Horario</td><td>${esc(t.horario)}</td></tr><tr><td>Teléfono</td><td>${esc(t.tel)}</td></tr><tr><td>Verificación</td><td>Nivel 2 · registro legal validado</td></tr></table></div>
+   <div class="card"><h3>Tu plan: ${state.planDemo} · ${pl.precio?fmt(pl.precio)+'/mes':'$0/mes'}</h3><ul style="margin:6px 0 0;padding-left:20px"><li>Productos: ${pl.limite===Infinity?'ilimitados':'hasta '+pl.limite}</li><li>Posicionamiento: ${pl.pos}</li><li>Gestión de pedidos: ${pl.pedidos}</li><li>Informe de ventas: ${pl.informe?'incluido':'no incluido'}</li></ul>
+    <p class="small muted" style="margin-top:10px">La insignia de verificación se gana con documentos y no depende del plan.</p></div></div>
+  <div class="grid g3" style="margin-bottom:18px"><div class="card kpi"><b>41</b>pedidos del mes</div><div class="card kpi"><b>${fmt(2665000)}</b>ingresos del mes</div><div class="card kpi"><b>410</b>visitas al perfil</div></div>
+  <div class="card"><h3>Ventas pendientes (${pend.length})</h3>${pend.length?cabPed+pend.map(filaPed).join(''):'<p class="muted">No tienes ventas pendientes. ¡Buen trabajo!</p>'}</div>`;
+}
+function tPedidos(){ const l=pedidosT(); return `<div class="card"><h3>Pedidos (${l.length})</h3><p class="small muted">Los pedidos hechos desde la vista del comprador aparecen aquí al instante. Los pagos los confirma la tienda, no PeaCorp.</p>${cabPed}${l.map(filaPed).join('')}</div>`; }
+function tCatalogo(){
+  const ps=state.productos.filter(p=>p.tienda===1), lim=PLANES[state.planDemo].limite, lleno=ps.length>=lim;
+  return `<div class="card"><div style="display:flex;justify-content:space-between;align-items:center;gap:10px;flex-wrap:wrap;margin-bottom:8px"><div><h3 style="margin:0">Catálogo</h3><span class="small muted">${ps.length} de ${lim===Infinity?'ilimitados':lim} productos del plan ${state.planDemo}</span></div>
+    <button class="btn" data-act="nuevo" ${lleno?'disabled':''}>+ Nuevo</button></div>
+   ${ps.length>lim?`<div class="alerta">Tienes ${ps.length} productos y el plan ${state.planDemo} permite ${lim}. Mejora a ${state.planDemo==='Emprende'?'Impulsa o Crece':'Crece'} para publicar más.</div>`:(lleno?`<div class="alerta">Llegaste al límite de tu plan (${lim}). Mejora de plan para agregar más productos.</div>`:'')}
+   ${ps.map(p=>{const est=p.estado==='Borrador'?'Borrador':(p.stock===0?'Agotado':'Publicado');
+    return `<div class="cat"><div class="th">${prenda(p.tipo,p.colores[0],p.largo)}</div><div><b>${esc(p.nombre)}</b><div class="small muted">${fmt(p.precio)}</div></div>
+     <span class="est ${est==='Publicado'?'e-ok':est==='Agotado'?'e-pago':'e-rec'}">${est}</span><span class="small">Stock: <b>${p.stock}</b></span>
+     <span class="small">${p.res?'★ '+p.cal.toFixed(1):'Sin reseñas'}</span>
+     <span>${est==='Borrador'?`<button class="btn sm" data-act="estadoProd" data-id="${p.id}" data-to="Publicado">Publicar</button>`:est==='Agotado'?`<button class="btn alt sm" data-act="reponer" data-id="${p.id}">Reponer +10</button>`:`<button class="btn alt sm" data-act="estadoProd" data-id="${p.id}" data-to="Borrador">Pasar a borrador</button>`}</span></div>`}).join('')}</div>`;
+}
+function tInforme(){
+  if(!PLANES[state.planDemo].informe){
+    return `<div class="card lock"><div class="ic">🔒</div><h2>El informe de ventas es del plan Crece</h2><p class="muted">Estás viendo el plan ${state.planDemo}. Mejora a Crece para ver ingresos, pedidos, ticket promedio, más vendidos y canal de cada mes.</p><button class="btn" data-act="mejorar">Mejorar a Crece</button></div>`;
+  }
+  const sem=[7,9,11,14], top=[['Camisa de lino manga larga',18],['Pantalón de lino recto',12],['Bermuda de lino beige',11]];
+  return `<div class="vhead no-print"><div><h2 style="margin:0">Informe de ventas · Octubre 2026</h2><span class="small muted">Comparado con septiembre 2026</span></div><div style="display:flex;gap:8px;flex-wrap:wrap"><button class="btn alt" data-act="generar">Generar reporte</button><button class="btn" data-act="pdf">Descargar PDF</button></div></div>
+  <div class="vhead" style="display:none"><h2>Lino & Co · Informe de octubre 2026</h2></div>
+  ${state.reporte?`<div class="alerta">Reporte generado el ${state.reporte}. Usa “Descargar PDF” para guardarlo o imprimirlo.</div>`:''}
+  <div class="grid g3" style="margin-bottom:18px"><div class="card kpi"><b>${fmt(2665000)}</b>Ingresos<div class="up">▲ 13,9 % vs. ${fmt(2340000)}</div></div><div class="card kpi"><b>41</b>Pedidos<div class="up">▲ 13,9 % vs. 36</div></div><div class="card kpi"><b>${fmt(65000)}</b>Ticket promedio<div class="muted small">Sin cambio vs. ${fmt(65000)}</div></div></div>
+  <div class="grid g2"><div class="card"><h3>Pedidos por semana</h3><div class="bars">${sem.map((v,i)=>`<div class="bar"><b>${v}</b><i style="height:${v/14*100*.78}%"></i></div>`).join('')}</div><div style="display:flex;gap:18px;padding:6px;text-align:center" class="small muted">${sem.map((v,i)=>`<span style="flex:1">Sem ${i+1}</span>`).join('')}</div></div>
+   <div class="card"><h3>Más vendidos</h3>${top.map(([n,v])=>`<div style="margin:10px 0"><div style="display:flex;justify-content:space-between"><span>${n}</span><b>${v}</b></div><div class="hb"><i style="width:${v/18*100}%;background:var(--fern)"></i></div></div>`).join('')}
+    <h3 style="margin-top:18px">Canal</h3><div class="hb" style="height:16px"><i style="width:${24/41*100}%;background:var(--hunter)"></i><i style="width:${17/41*100}%;background:var(--sage)"></i></div><div class="small" style="margin-top:6px">24 en línea · 17 en tienda</div></div></div>`;
+}
+
+/* ---------- 5. MODALES ---------- */
+function abrirModal(m){state.modal=m;renderModal();}
+function cerrarModal(){state.modal=null;renderModal();}
+function renderModal(){
+  const m=state.modal, box=$('#modal');
+  if(!m){box.innerHTML='';return;}
+  const html={pedido:mPedido,resena:mResena,camara:mCamara,nuevo:mNuevo}[m.k](m);
+  box.innerHTML=`<div class="overlay" role="dialog" aria-modal="true"><div class="modal ${m.k==='nuevo'?'wide':''}">${html}</div></div>`;
+}
+function mPedido(m){
+  const p=producto(m.pid), t=tienda(p.tienda);
+  if(m.hecho) return `<div class="ok-ic">✓</div><h3 style="text-align:center">¡Pedido enviado!</h3>
+    <p style="text-align:center">Tu pedido #${m.hecho} fue enviado a la tienda. Ella te contactará para acordar pago y entrega.</p>
+    <div class="mfoot" style="justify-content:center"><button class="btn alt" data-act="cerrar">Seguir buscando</button><button class="btn" data-act="verPedidos">Ver mis pedidos</button></div>`;
+  const max=Math.min(10,p.stock);
+  return `<h3>Hacer pedido</h3><p class="muted small">${esc(p.nombre)} · ${esc(t.nombre)}</p>
+   <label>Talla<select data-m="talla">${p.tallas.map(x=>`<option ${x===m.talla?'selected':''}>${x}</option>`).join('')}</select></label>
+   <label>Cantidad<br><span class="qty"><button data-act="qty" data-d="-1" aria-label="Menos">−</button><b>${m.qty}</b><button data-act="qty" data-d="1" aria-label="Más" ${m.qty>=max?'disabled':''}>+</button></span></label>
+   <fieldset><legend class="small"><b>¿Cómo lo quieres?</b></legend>
+    ${p.fisico?`<label class="opt"><input type="radio" name="canal" value="tienda" data-m="canal" ${m.canal==='tienda'?'checked':''}> Recoger en tienda</label>`:''}
+    ${p.online?`<label class="opt"><input type="radio" name="canal" value="online" data-m="canal" ${m.canal==='online'?'checked':''}> Hacer pedido en línea</label>`:''}</fieldset>
+   <div class="pago">El pago y la entrega se acuerdan directamente con la tienda.</div>
+   <div><b>Total estimado: ${fmt(p.precio*m.qty)}</b></div>
+   <div class="mfoot"><button class="btn alt" data-act="cerrar">Cancelar</button><button class="btn" data-act="confirmarPedido">Confirmar pedido</button></div>`;
+}
+function mResena(m){
+  const o=state.pedidos.find(x=>x.id===m.oid), p=producto(o.pid);
+  return `<h3>Dejar reseña</h3><p class="muted small">${esc(p.nombre)} · Pedido #${o.id}. Confirmas que la tienda te entregó este pedido.</p>
+   <div class="estr" role="radiogroup" aria-label="Calificación">${[1,2,3,4,5].map(n=>`<button class="${n<=m.e?'on':''}" data-act="estrella" data-n="${n}" aria-label="${n} estrellas">★</button>`).join('')}</div>
+   <label>Comentario<textarea rows="3" data-m="txt" placeholder="Cuéntales a otros cómo te quedó">${esc(m.txt)}</textarea></label>
+   <div class="mfoot"><button class="btn alt" data-act="cerrar">Cancelar</button><button class="btn" data-act="enviarResena">Enviar reseña</button></div>`;
+}
+function mCamara(){
+  const ej=[['camisa','beige','Camisa beige'],['vestido','verde','Vestido verde'],['pantalon','negro','Pantalón negro']];
+  return `<h3>Buscar por imagen</h3><p class="muted small">Simulado: elige una foto de ejemplo y aplicaremos filtros de prenda y color. La visión por computador real es parte del roadmap.</p>
+   <div class="sample">${ej.map(([t,c,n])=>`<button data-act="imagen" data-t="${t}" data-c="${c}">${prenda(t,c,'largo')}<div class="small"><b>${n}</b></div></button>`).join('')}</div>
+   <div class="mfoot"><button class="btn alt" data-act="cerrar">Cancelar</button></div>`;
+}
+// Carga asistida de producto (la "IA" es simulada con reglas)
+const TIPOS_L=['camisa','pantalon','vestido','bermuda','falda'], COLS_L=['beige','blanco','verde','azul','negro','terracota'];
+function sugerir(nombre,tam){
+  const n=' '+norm(nombre)+' '; let tipo=null,color=null;
+  for(const [k,re] of TIPOS_RE) if(re.test(n)){tipo=k;break;}
+  for(const [k,re] of COLOR_RE) if(re.test(n)){color=k;break;}
+  if(!tipo) tipo=TIPOS_L[(n.length+tam)%5];
+  if(!color) color=COLS_L[(n.length*3+tam)%6];
+  const tela=['lino','algodón','mezcla'][(n.length+tam)%3];
+  return {tipo,color,tela,nombre:`${cap(tipo==='pantalon'?'pantalón':tipo)} ${color}`,
+    txt:`${cap(tipo==='pantalon'?'pantalón':tipo)} de ${tela} en color ${color}. Cómodo, fresco y listo para el clima de Cúcuta.`,precio:60000};
+}
+function mNuevo(m){
+  if(!m.paso) return `<h3>Nuevo producto · Carga asistida</h3><p class="muted small">Elige una foto de la prenda y la “IA” propondrá categoría, color y descripción (podrás editarlas). <b>Simulado con reglas</b>; la IA real (Gemini) es parte del roadmap.</p>
+    <label>Foto de la prenda<input type="file" id="archivo" accept="image/*" style="border:0;padding:6px 0"></label>
+    <div class="mfoot"><button class="btn alt" data-act="cerrar">Cancelar</button><button class="btn alt" data-act="ejemploFoto">Usar foto de ejemplo</button></div>`;
+  return `<h3>Revisa la propuesta</h3><p class="small muted">Sugerencia simulada con reglas. Edita lo que quieras antes de publicar.</p>
+   <div class="grid g2" style="gap:12px;align-items:start"><div class="img" style="border-radius:12px;aspect-ratio:1">${m.foto?`<img src="${m.foto}" alt="Foto subida" style="max-width:100%;max-height:100%;border-radius:10px">`:prenda(m.tipo,m.color,'largo')}</div>
+   <div><label>Categoría<select data-m="tipo" data-rr="1">${TIPOS_L.map(x=>`<option value="${x}" ${x===m.tipo?'selected':''}>${cap(x==='pantalon'?'pantalón':x)}</option>`).join('')}</select></label>
+   <label>Color<select data-m="color" data-rr="1">${Object.keys(COLORES).map(x=>`<option ${x===m.color?'selected':''}>${x}</option>`).join('')}</select></label>
+   <label>Tela<select data-m="tela">${['lino','algodón','mezcla'].map(x=>`<option ${x===m.tela?'selected':''}>${x}</option>`).join('')}</select></label></div></div>
+   <label>Nombre<input type="text" data-m="nombre" value="${esc(m.nombre)}"></label>
+   <label>Precio (COP)<input type="number" data-m="precio" min="1000" step="1000" value="${m.precio}"></label>
+   <label>Descripción<textarea rows="3" data-m="txt">${esc(m.txt)}</textarea></label>
+   <div class="mfoot"><button class="btn alt" data-act="cerrar">Cancelar</button><button class="btn alt" data-act="publicar" data-modo="Borrador">Guardar borrador</button><button class="btn" data-act="publicar" data-modo="Publicado">Publicar</button></div>`;
+}
+
+/* ---------- Render principal ---------- */
+function render(){
+  renderHeader();
+  const v=state.modo==='tienda'?vVendedor:({buscar:vBuscar,ficha:vFicha,tienda:vTienda,explorar:vExplorar,pedidos:vPedidos}[state.vista]||vBuscar);
+  $('#app').innerHTML=v();
+  renderModal();
+}
+
+/* ---------- 6. ACCIONES Y EVENTOS ---------- */
+function cambiarEstado(id){
+  const o=state.pedidos.find(x=>x.id===id); if(!o||!SIG[o.estado]) return;
+  o.estado=SIG[o.estado][1]; toast(`Pedido #${o.id}: ${o.estado}`); render();
+}
+function crearPedido(m){
+  const p=producto(m.pid), id=state.proxPedido++;
+  state.pedidos.push({id,pid:p.id,tienda:p.tienda,label:`${p.nombre} · ${m.talla}`,talla:m.talla,qty:m.qty,total:p.precio*m.qty,canal:m.canal,estado:m.canal==='tienda'?'Recoger en tienda':'Pago por confirmar',mine:true});
+  p.stock=Math.max(0,p.stock-m.qty); m.hecho=id;
+}
+function enviarResena(m){
+  const o=state.pedidos.find(x=>x.id===m.oid), p=producto(o.pid);
+  p.cal=Math.round(((p.cal*p.res+m.e)/(p.res+1))*10)/10; p.res+=1; o.resena=m.e;
+  state.resenas.push({pid:p.id,e:m.e,txt:m.txt.trim(),autor:'Tú',fecha:new Date().toLocaleDateString('es-CO')});
+  toast('¡Gracias! Tu reseña ya cuenta en la calificación.');
+}
+function publicarNuevo(modo){
+  const m=state.modal; const precio=parseInt(m.precio,10);
+  if(!m.nombre.trim()||!(precio>0)){toast('Escribe un nombre y un precio válido.');return;}
+  state.productos.push({id:state.proxProd++,nombre:m.nombre.trim(),tienda:1,precio,tela:m.tela,pais:'Colombia',tallas:m.tipo==='pantalon'?['30','32','34','36']:['S','M','L','XL'],colores:[m.color],tipo:m.tipo,estilo:'casual',largo:m.tipo==='vestido'||m.tipo==='falda'?'largo':undefined,stock:5,cal:0,res:0,online:true,fisico:true,estado:modo,desc:m.txt.trim()||'Producto nuevo.'});
+  cerrarModal(); toast(modo==='Publicado'?'Producto publicado. Ya aparece en el buscador.':'Guardado como borrador.'); render();
+}
+
+document.addEventListener('click',e=>{
+  if(e.target.classList&&e.target.classList.contains('overlay')){cerrarModal();return;}
+  const el=e.target.closest('[data-act]'); if(!el) return;
+  const d=el.dataset, m=state.modal;
+  switch(d.act){
+    case 'logo': ir('buscar'); break;
+    case 'nav': ir(d.v); break;
+    case 'modo': state.modo=state.modo==='tienda'?'comprador':'tienda'; state.tab='resumen'; render(); window.scrollTo(0,0); break;
+    case 'ficha': state.talla=null; ir('ficha',+d.id); break;
+    case 'tienda': ir('tienda',+d.id); break;
+    case 'volver': ir('buscar'); break;
+    case 'ejemplo': lanzarBusqueda(d.q); break;
+    case 'quitar': if(d.k==='tokens') state.busqueda.tokens=[]; else delete state.busqueda.filtros[d.k]; render(); break;
+    case 'limpiar': state.busqueda={draft:'',texto:'',filtros:{},tokens:[]}; render(); break;
+    case 'reportar': toast('¡Gracias! Revisaremos este resultado para mejorar la búsqueda.'); break;
+    case 'camara': abrirModal({k:'camara'}); break;
+    case 'imagen': {const n={camisa:'camisa',pantalon:'pantalón',vestido:'vestido'}[d.t];
+      state.busqueda={draft:`Búsqueda por imagen: ${n} ${d.c}`,texto:'imagen',filtros:{tipo:d.t,color:d.c},tokens:[]};
+      state.modal=null; render(); toast('Búsqueda por imagen simulada: reconocimos prenda y color.'); break;}
+    case 'talla': state.talla=d.t; render(); break;
+    case 'pedir': {const p=producto(+d.id); abrirModal({k:'pedido',pid:p.id,talla:state.talla||p.tallas[0],qty:1,canal:p.fisico&&!p.online?'tienda':'online'}); break;}
+    case 'qty': {const p=producto(m.pid); m.qty=Math.max(1,Math.min(Math.min(10,p.stock),m.qty+(+d.d))); renderModal(); break;}
+    case 'confirmarPedido': crearPedido(m); render(); break;
+    case 'cerrar': cerrarModal(); break;
+    case 'verPedidos': state.modal=null; ir('pedidos'); break;
+    case 'resena': abrirModal({k:'resena',oid:+d.id,e:5,txt:''}); break;
+    case 'estrella': m.e=+d.n; renderModal(); break;
+    case 'enviarResena': enviarResena(m); state.modal=null; render(); break;
+    case 'tab': state.tab=d.t; render(); break;
+    case 'avanzar': cambiarEstado(+d.id); break;
+    case 'nuevo': if(state.productos.filter(p=>p.tienda===1).length>=PLANES[state.planDemo].limite){toast('Llegaste al límite de productos de tu plan.');break;} abrirModal({k:'nuevo',paso:0}); break;
+    case 'ejemploFoto': Object.assign(m,sugerir('camisa_beige_ejemplo.jpg',7),{paso:1,foto:null}); renderModal(); break;
+    case 'publicar': publicarNuevo(d.modo); break;
+    case 'estadoProd': {const p=producto(+d.id); p.estado=d.to; toast(d.to==='Publicado'?'Producto publicado.':'Producto pasado a borrador.'); render(); break;}
+    case 'reponer': producto(+d.id).stock=10; toast('Stock repuesto: 10 unidades.'); render(); break;
+    case 'mejorar': state.planDemo='Crece'; tienda(1).plan='Crece'; toast('Ahora ves la tienda con plan Crece.'); render(); break;
+    case 'generar': state.reporte=new Date().toLocaleString('es-CO'); toast('Reporte de octubre 2026 generado.'); render(); break;
+    case 'pdf': window.print(); break;
+    case 'reiniciar': state=estadoInicial(); render(); window.scrollTo(0,0); toast('Demo reiniciada.'); break;
+  }
+});
+// Tarjetas accesibles con teclado
+document.addEventListener('keydown',e=>{
+  if(e.key==='Escape'&&state.modal) cerrarModal();
+  if((e.key==='Enter'||e.key===' ')&&e.target.matches&&e.target.matches('.prod[data-act]')){e.preventDefault();e.target.click();}
+});
+// Búsqueda por texto
+document.addEventListener('submit',e=>{
+  if(e.target.dataset.form==='buscar'){e.preventDefault();lanzarBusqueda(new FormData(e.target).get('q')||'');}
+});
+document.addEventListener('input',e=>{
+  if(e.target.id==='q') state.busqueda.draft=e.target.value;
+  campoModal(e.target,false);
+});
+// Filtros manuales, selector de plan y campos de los modales
+document.addEventListener('change',e=>{
+  const el=e.target;
+  if(el.id==='archivo'&&el.files&&el.files[0]){            // carga de foto → propuesta simulada
+    const fl=el.files[0], rd=new FileReader();
+    rd.onload=()=>{Object.assign(state.modal,sugerir(fl.name,fl.size),{paso:1,foto:rd.result});renderModal();};
+    rd.readAsDataURL(fl); return;
+  }
+  if(campoModal(el,true)) return;
+  const k=el.dataset.f; if(!k) return;
+  const f=state.busqueda.filtros;
+  if(k==='planDemo'){state.planDemo=el.value;tienda(1).plan=el.value;render();return;}
+  if(k==='qtienda'){state.qtienda=el.value;render();return;}
+  if(k==='cerca'){ if(el.checked) f.cerca=true; else delete f.cerca; }
+  else if(k==='max'){ const n=parseInt(el.value,10); if(n>0) f.max=n; else delete f.max; }
+  else { if(el.value) f[k]=el.value; else delete f[k]; }
+  render();
+});
+function campoModal(el,fin){
+  const c=el.dataset&&el.dataset.m; if(!c||!state.modal) return false;
+  let v=el.value; if(c==='qty') v=+v;
+  state.modal[c]=v;
+  if(fin&&el.dataset.rr) renderModal();
+  return true;
+}
+
+render();
+</script>
+</body>
+</html>
